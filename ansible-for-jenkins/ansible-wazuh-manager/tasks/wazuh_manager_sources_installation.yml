@@ -35,15 +35,29 @@
     - 'USER_ENABLE_SYSLOG="y"'
     - 'USER_ENABLE_AUTHD="n"'
     - 'USER_AUTO_START="y"'
+    - 'USER_UPDATE="n"'
 
 - name: Compiling and installing Wazuh (please wait)
   shell: /root/wazuh/install.sh
 
-- name: Adding firewall rule
+- name: Adding firewall Manager rule
   firewalld:
-    port: 1514-1515/udp
+    zone: public
+    port: 1514/udp
     permanent: true
     state: enabled
+
+- name: Adding firewall Authd rule
+  firewalld:
+    zone: public
+    port: 1515/tcp
+    permanent: true
+    state: enabled
+    
+- name: Restarting firewall
+  service:
+    name: firewalld
+    state: restarted
 
 - name: Starting wazuh-manager service
   service:
